@@ -38,4 +38,8 @@ if [ "$FORCE_PULL" = true ] ; then
     rm -rf $data_dir
 fi
 
-zenodo_get -d 10.5281/zenodo.$record_id -o $data_dir
+zenodo_get -r $record_id -o $data_dir --keep
+
+# `--keep` in principle should avoid overwriting the changes but it does not seem to be
+# working.
+# ref: https://github.com/dvolgyes/zenodo_get/issues/29
