@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------
 # Download file based on RecordID from environment variable
 
-record_id="$RECORD_ID"
+doi="$DOI"
 
 check_command="df -h -x tmpfs -x devtmpfs | grep rshare"
 
@@ -30,7 +30,7 @@ if [ "$(ls /storage 2>&1)" = "ls: reading directory '/storage': Input/output err
     exit 1
 fi
 
-data_dir="/storage/ai4os-storage/zenodo/$record_id"
+data_dir="/storage/ai4os-storage/$doi"
 
 
 if [ "$FORCE_PULL" = true ] ; then
@@ -38,8 +38,4 @@ if [ "$FORCE_PULL" = true ] ; then
     rm -rf $data_dir
 fi
 
-zenodo_get -r $record_id -o $data_dir --keep
-
-# `--keep` in principle should avoid overwriting the changes but it does not seem to be
-# working.
-# ref: https://github.com/dvolgyes/zenodo_get/issues/29
+datahugger $doi $data_dir
