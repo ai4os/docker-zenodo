@@ -30,7 +30,7 @@ if [ "$(ls /storage 2>&1)" = "ls: reading directory '/storage': Input/output err
     exit 1
 fi
 
-data_dir="/storage/ai4os-storage/$doi"
+data_dir="/storage/ai4os-storage/datasets/$doi"
 
 
 if [ "$FORCE_PULL" = true ] ; then
