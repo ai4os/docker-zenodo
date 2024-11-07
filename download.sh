@@ -5,18 +5,18 @@
 # ------------------------------------------------------------------------
 # Download file based on RecordID from environment variable
 
-#As doi can be either a DOI or a URL, we need to normalize it to a path safe string
-
 doi="$DOI"
-doi=$1
+
+# Check if the "DOI" variable is indeed a DOI or an URL
+# If it's an URL, make it path safe
 
 if [[ $doi == http* ]]; then
-    doi_path="$(echo "$doi" | sed -E 's|http(s)?://||; s|^www.||; s|/$|| ; s|/|-|g')" 
+    doi_path="$(echo "$doi" | sed -E 's|http(s)?://||; s|^www.||; s|/$|| ; s|/|-|g')"
 else
     doi_path="$doi"
 fi
 
-# echo "$doi_path"
+# Wait until storage is mounted to proceed
 
 check_command="df -h -x tmpfs -x devtmpfs | grep rshare"
 
@@ -36,13 +36,15 @@ while true; do
 done
 
 # Check if /storage is accessible
+
 if [ "$(ls /storage 2>&1)" = "ls: reading directory '/storage': Input/output error" ]; then
     echo "Error: /storage is not accessible"
     exit 1
 fi
 
-data_dir="/storage/ai4os-storage/datasets/$doi_path"
+# Download dataset to proper dir
 
+data_dir="/storage/ai4os-storage/datasets/$doi_path"
 
 if [ "$FORCE_PULL" = true ] ; then
     echo "FORCE_PULL set to true, deleting data dir"
