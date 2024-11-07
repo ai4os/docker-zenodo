@@ -14,4 +14,4 @@ RUN pip install datahugger pandas
 RUN export PATH="$HOME/.local/bin:$PATH"
 
 # Run download.py when the container launches
-CMD sh ./download.sh
+CMD bash ./download.sh
