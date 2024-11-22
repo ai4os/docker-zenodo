@@ -51,4 +51,13 @@ if [ "$FORCE_PULL" = true ] ; then
     rm -rf $data_dir
 fi
 
-datahugger $doi $data_dir
+mkdir -p $data_dir
+datahugger "$doi" "$data_dir" |& tee "$data_dir/ai4os.log"
+
+# We exit 0 because we don't want to fail the whole deployment because a dataset could
+# not be downloaded. Especially because users might add dataset URLs that are not
+# supported by Datahugger. So we exit 0, and let users read in the log why their
+# download failed.
+# Making the Dashboard check if a URL is supported by Datahugger seems a PITA because
+# we would need to constantly keep the Dashboard updated with Datahugger's regexps
+exit 0
