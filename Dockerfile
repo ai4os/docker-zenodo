@@ -8,6 +8,7 @@ WORKDIR /usr/src/app
 COPY download.sh .
 
 RUN pip install datahugger
+RUN pip install datasets
 
 RUN export PATH="$HOME/.local/bin:$PATH"
 
