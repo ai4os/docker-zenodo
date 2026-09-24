@@ -54,6 +54,18 @@ fi
 mkdir -p $data_dir
 datahugger "$doi" "$data_dir" |& tee "$data_dir/ai4os.log"
 
+# Export Hugging Face Arrow files as JSON Lines after a successful download.
+if [[ "${PIPESTATUS[0]}" -eq 0 && "$doi" =~ ^https?://huggingface\.co/datasets/ ]]; then
+    python - "$data_dir" <<'PYTHON' |& tee -a "$data_dir/ai4os.log"
+from pathlib import Path
+import sys
+from datasets import Dataset
+
+for arrow_file in Path(sys.argv[1]).rglob("*.arrow"):
+    Dataset.from_file(str(arrow_file)).to_json(str(arrow_file.with_suffix(".json")))
+PYTHON
+fi
+
 # We exit 0 because we don't want to fail the whole deployment because a dataset could
 # not be downloaded. Especially because users might add dataset URLs that are not
 # supported by Datahugger. So we exit 0, and let users read in the log why their
