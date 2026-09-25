@@ -54,15 +54,24 @@ fi
 mkdir -p $data_dir
 datahugger "$doi" "$data_dir" |& tee "$data_dir/ai4os.log"
 
-# Export Hugging Face Arrow files as JSON Lines after a successful download.
+# Export Hugging Face Arrow files as JSON Lines (default) or CSV.
 if [[ "${PIPESTATUS[0]}" -eq 0 && "$doi" =~ ^https?://huggingface\.co/datasets/ ]]; then
-    python - "$data_dir" <<'PYTHON' |& tee -a "$data_dir/ai4os.log"
+    python - "$data_dir" "${HF_EXPORT_FORMAT:-json}" <<'PYTHON' |& tee -a "$data_dir/ai4os.log"
 from pathlib import Path
 import sys
 from datasets import Dataset
 
+output_format = sys.argv[2]
+if output_format not in {"json", "csv"}:
+    sys.exit("HF_EXPORT_FORMAT must be json or csv")
+
 for arrow_file in Path(sys.argv[1]).rglob("*.arrow"):
-    Dataset.from_file(str(arrow_file)).to_json(str(arrow_file.with_suffix(".json")))
+    dataset = Dataset.from_file(str(arrow_file))
+    output_file = str(arrow_file.with_suffix("." + output_format))
+    if output_format == "csv":
+        dataset.to_csv(output_file, index=False)
+    else:
+        dataset.to_json(output_file)
 PYTHON
 fi
 
